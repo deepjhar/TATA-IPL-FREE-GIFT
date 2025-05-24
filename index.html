@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TATA IPL Free Gift!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Lobster&display=swap');
+
+        :root {
+            --primary-glow: #00ffdd;
+            --secondary-glow: #ff0077;
+            --text-color: #ffffff;
+            --bg-dark: #1a0e2b; 
+            --bg-light: #3c1a54; 
+            --button-bg: linear-gradient(135deg, #ff4081, #8c1eff); 
+            --button-hover-bg: linear-gradient(135deg, #ff66a3, #a347ff);
+            --input-bg: rgba(255, 255, 255, 0.1);
+            --progress-bar-bg: rgba(255, 255, 255, 0.2);
+            --progress-bar-fill: linear-gradient(90deg, var(--primary-glow), var(--secondary-glow));
+            --sms-info-color: #a0e0ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-light) 100%);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; 
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            text-align: center;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 221, 0.15), 0 0 60px rgba(255, 0, 119, 0.15);
+            max-width: 500px;
+            width: 100%;
+            margin-top: 20px; 
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: clamp(1.8rem, 6vw, 2.8rem);
+            margin-bottom: 5px;
+            color: var(--primary-glow);
+            text-shadow: 0 0 8px rgba(0, 255, 221, 0.5);
+            white-space: nowrap;
+        }
+
+        .sub-heading {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+            font-size: clamp(0.9rem, 3.5vw, 1.2rem);
+            color: var(--text-color);
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: clamp(280px, 75vw, 380px); 
+            height: clamp(280px, 75vw, 380px);
+            margin: 20px auto; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pointer {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #FFD700; 
+            position: absolute;
+            top: -15px; 
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+        
+        #spinWheel {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 7s cubic-bezier(0.1, 0.7, 0.3, 1);
+        }
+
+        #centerButtonImage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18%; 
+            max-width: 60px;
+            height: auto;
+            z-index: 5; 
+            pointer-events: none;
+        }
+
+
+        .spin-button, .action-button {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            color: var(--text-color);
+            background: var(--button-bg);
+            cursor: pointer;
+            margin-top: 15px; 
+            margin-bottom: 10px;
+            box-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--primary-glow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .spin-button::before, .action-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translate(-50%, -50%) rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .spin-button:hover, .action-button:hover:not(:disabled) {
+            background: var(--button-hover-bg);
+            box-shadow: 0 0 15px var(--primary-glow), 0 0 30px var(--primary-glow), 0 0 5px var(--secondary-glow);
+            transform: translateY(-3px) scale(1.05);
+        }
+        
+        .spin-button:hover::before, .action-button:hover:not(:disabled)::before {
+            width: 100%;
+            height: 100%;
+            opacity: 1;
+        }
+
+        .spin-button:active, .action-button:active:not(:disabled) {
+            transform: translateY(0px) scale(0.98);
+            box-shadow: 0 0 5px var(--primary-glow), 0 0 10px var(--primary-glow);
+        }
+        
+        .spin-button:disabled, .action-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background: gray;
+            box-shadow: none;
+        }
+        .spin-button:disabled:hover, .action-button:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        .spin-button:disabled::before, .action-button:disabled::before {
+            opacity: 0;
+        }
+
+        .message-section {
+            margin-top: 20px; 
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-section h2 {
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            color: var(--primary-glow);
+            margin-bottom: 10px;
+        }
+
+        .message-section p:not(.sub-heading):not(.sms-info):not(.progress-text) {
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .sms-info {
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            color: var(--sms-info-color);
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px dashed var(--primary-glow);
+            border-radius: 8px;
+            background-color: rgba(0,0,0,0.2);
+            text-align: left;
+        }
+        .sms-info strong {
+            color: var(--primary-glow);
+        }
+
+
+        .form-input {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-glow);
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            display: block; 
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .progress-container {
+            width: 90%;
+            max-width: 300px;
+            background-color: var(--progress-bar-bg);
+            border-radius: 10px;
+            margin: 10px auto 5px; 
+            padding: 3px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .progress-bar {
+            height: 15px;
+            width: 0%; 
+            background: var(--progress-bar-fill);
+            border-radius: 7px;
+            transition: width 0.3s ease-out; 
+            text-align: center;
+            line-height: 15px;
+            font-size: 0.7rem;
+            color: var(--bg-dark); 
+        }
+        .progress-text {
+            font-size: 0.9rem;
+            margin-bottom: 15px; 
+            color: var(--primary-glow);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .animated-border {
+            position: relative;
+            padding: 3px; 
+            border-radius: 18px; 
+            overflow: hidden;
+            margin-top: 20px; 
+        }
+        .animated-border::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            z-index: -1;
+            margin: -3px; 
+            border-radius: inherit; 
+            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow), var(--primary-glow));
+            background-size: 400% 400%;
+            animation: gradientAnimation 5s ease infinite;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .animated-border > div { 
+            background: var(--bg-light); 
+            padding: 20px;
+            border-radius: 15px; 
+            z-index: 1;
+        }
+        
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        #prizeImage {
+            display: none; /* Initially hidden */
+            max-width: 120px; 
+            height: auto;
+            margin: 15px auto; 
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+    </style>
+</head>
+<body>
+    <script type="text/javascript">
+	atOptions = {
+		'key' : '86c4b998f1c48d65c32174a757cb502f',
+		'format' : 'iframe',
+		'height' : 60,
+		'width' : 468,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/86c4b998f1c48d65c32174a757cb502f/invoke.js"></script>
+    <audio id="spinSound" src="wheel_spin_sound.mp3" preload="auto"></audio>
+
+    <div class="container">
+        <h1>TATA IPL FREE GIFT</h1>
+        <p class="sub-heading">Spin and win IPL jersey and ipl ticket</p>
+
+        <div class="wheel-container" id="wheelArea"> 
+            <div class="pointer"></div>
+            <img src="spin.png" id="spinWheel" alt="Spin Wheel">
+            <img src="button.png" id="centerButtonImage" alt="Center Button">
+        </div>
+
+        <button class="spin-button" id="spinButton">SPIN NOW</button>
+
+        <div id="winningMessageSection" class="animated-border hidden">
+            <div>
+                <h2 id="prizeWonText"></h2>
+                <img id="prizeImage" src="" alt="Prize Image"> <!-- Added image tag -->
+                <p id="instructionText">To claim your prize, please fill in your details below and share this page with 5 WhatsApp friends.</p>
+                
+                <input type="text" id="userName" class="form-input" placeholder="Your Name" required>
+                <input type="tel" id="userMobile" class="form-input" placeholder="Mobile Number" required pattern="[0-9]{10}">
+
+                <button class="action-button" id="whatsappShareButton">Share on WhatsApp (0/5)</button>
+                
+                <div id="progressArea" class="hidden">
+                    <div class="progress-text" id="shareProgressText"></div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="shareProgressBar"></div>
+                    </div>
+                </div>
+
+                <button class="action-button hidden" id="claimPrizeButton">Claim My Prize!</button> 
+            </div>
+        </div>
+        
+        <div id="successMessageSection" class="animated-border hidden">
+            <div>
+                <h2>Claim Submitted!</h2>
+                <p>Your prize claim has been submitted successfully!</p>
+                <p>Congratulations again! You will be contacted soon.</p>
+                <p id="simulatedSmsMessage" class="sms-info hidden"></p>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="confettiCanvas"></canvas>
+
+    <script>
+        // const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE"; // REMOVED
+
+        const prizes = [
+            "LSG JERSEY", "KKR JERSEY", "PBKS JERSEY", "CSK JERSEY",
+            "RCB JERSEY", "DC JERSEY", "MI JERSEY", "BETTER LUCK NEXT TIME",
+            "GT JERSEY", "SRH JERSEY", "RR JERSEY", "FREE IPL TICKET"
+        ];
+
+        const winnablePrizes = prizes.filter(prize => prize !== "BETTER LUCK NEXT TIME");
+
+        // Map prize names to image filenames
+        const prizeImageMap = {
+            "LSG JERSEY": "lsg.png",
+            "KKR JERSEY": "kkr.png",
+            "PBKS JERSEY": "pbks.png",
+            "CSK JERSEY": "csk.png",
+            "RCB JERSEY": "rcb.png",
+            "DC JERSEY": "dc.png",
+            "MI JERSEY": "mi.png",
+            "GT JERSEY": "gt.png",
+            "SRH JERSEY": "srh.png",
+            "RR JERSEY": "rr.png",
+            "FREE IPL TICKET": "ticket.png"
+        };
+
+        const wheel = document.getElementById('spinWheel');
+        const spinButton = document.getElementById('spinButton');
+        const wheelArea = document.getElementById('wheelArea'); 
+        
+        const winningMessageSection = document.getElementById('winningMessageSection');
+        const prizeWonText = document.getElementById('prizeWonText');
+        const prizeImageElement = document.getElementById('prizeImage'); // Get prize image element
+        const instructionText = document.getElementById('instructionText');
+        const whatsappShareButton = document.getElementById('whatsappShareButton');
+        
+        const userNameInput = document.getElementById('userName');
+        const userMobileInput = document.getElementById('userMobile');
+        const claimPrizeButton = document.getElementById('claimPrizeButton');
+        
+        const successMessageSection = document.getElementById('successMessageSection');
+        const simulatedSmsMessageElement = document.getElementById('simulatedSmsMessage');
+
+        const progressArea = document.getElementById('progressArea');
+        const shareProgressText = document.getElementById('shareProgressText');
+        const shareProgressBar = document.getElementById('shareProgressBar');
+
+        const spinSound = document.getElementById('spinSound');
+        
+        let cumulativeRotation = 0;
+        const spinDurationSeconds = 7;
+        let sharedCount = 0;
+        const totalSharesNeeded = 5;
+        let currentWonPrizeName = "";
+
+        let soundFadeInterval = null;
+        let startFadeTimeoutId = null;
+        const SOUND_FADE_OUT_DURATION = 1500;
+
+        function getPrizeImageSrc(prizeName) {
+            return prizeImageMap[prizeName] || ""; // Return image path or empty string
+        }
+
+        function startSoundFade() {
+            if (!spinSound || spinSound.paused || !spinSound.loop) return;
+
+            const fadeSteps = 30;
+            const fadeIntervalTime = SOUND_FADE_OUT_DURATION / fadeSteps;
+            let currentVolume = spinSound.volume;
+            const volumeDecrementPerStep = currentVolume / fadeSteps;
+
+            if (soundFadeInterval) clearInterval(soundFadeInterval);
+
+            soundFadeInterval = setInterval(() => {
+                if (spinSound.volume > volumeDecrementPerStep) {
+                    spinSound.volume -= volumeDecrementPerStep;
+                } else {
+                    spinSound.volume = 0;
+                    spinSound.pause();
+                    spinSound.loop = false;
+                    clearInterval(soundFadeInterval);
+                    soundFadeInterval = null;
+                    spinSound.volume = 1;
+                }
+            }, fadeIntervalTime);
+        }
+
+        function updateShareProgress() {
+            const progressPercentage = (sharedCount / totalSharesNeeded) * 100;
+            shareProgressBar.style.width = `${progressPercentage}%`;
+            
+            if (sharedCount > 0) {
+                progressArea.classList.remove('hidden');
+                shareProgressText.textContent = `Shared with ${sharedCount}/${totalSharesNeeded} friends.`;
+            } else {
+                progressArea.classList.add('hidden');
+                shareProgressText.textContent = '';
+            }
+            whatsappShareButton.textContent = `Share on WhatsApp (${sharedCount}/${totalSharesNeeded})`;
+
+            if (sharedCount >= totalSharesNeeded) {
+                instructionText.textContent = "Great! You've completed the sharing step. Now claim your prize!";
+                whatsappShareButton.classList.add('hidden');
+                claimPrizeButton.classList.remove('hidden');
+                claimPrizeButton.disabled = false;
+            } else {
+                instructionText.textContent = "To claim your prize, please fill in your details below and share this page with 5 WhatsApp friends.";
+                whatsappShareButton.classList.remove('hidden');
+                whatsappShareButton.disabled = false;
+                claimPrizeButton.classList.add('hidden');
+            }
+        }
+
+
+        spinButton.addEventListener('click', () => {
+            spinButton.disabled = true;
+            spinButton.textContent = "SPINNING..."; 
+            hideMessages();
+            sharedCount = 0; 
+            currentWonPrizeName = "";
+
+            if (startFadeTimeoutId) clearTimeout(startFadeTimeoutId);
+            if (soundFadeInterval) {
+                clearInterval(soundFadeInterval);
+                soundFadeInterval = null;
+            }
+            if (spinSound) {
+                spinSound.pause();
+                spinSound.currentTime = 0;
+                spinSound.volume = 1;
+                spinSound.loop = true;
+                spinSound.play().catch(error => console.error("Error playing sound:", error));
+
+                let fadeStartTime = (spinDurationSeconds * 1000) - SOUND_FADE_OUT_DURATION;
+                if (fadeStartTime < 0) fadeStartTime = 0;
+                
+                startFadeTimeoutId = setTimeout(startSoundFade, fadeStartTime);
+            }
+
+            const randomWinnableIndex = Math.floor(Math.random() * winnablePrizes.length);
+            currentWonPrizeName = winnablePrizes[randomWinnableIndex];
+            const winningPrizeOriginalIndex = prizes.indexOf(currentWonPrizeName);
+
+            const segmentDegrees = 360 / prizes.length;
+            const targetPrizeAngleOnWheel = (winningPrizeOriginalIndex * segmentDegrees) + (segmentDegrees / 2);
+            const additionalRotations = 5 + Math.floor(Math.random() * 5);
+            let desiredAngle = (-targetPrizeAngleOnWheel % 360 + 360) % 360;
+            let currentDisplayAngle = (cumulativeRotation % 360 + 360) % 360;
+            let turnAmount = (desiredAngle - currentDisplayAngle + 360) % 360;
+            cumulativeRotation += (additionalRotations * 360) + turnAmount;
+
+            wheel.style.transition = `transform ${spinDurationSeconds}s cubic-bezier(0.1, 0.7, 0.3, 1)`;
+            wheel.style.transform = `rotate(${cumulativeRotation}deg)`;
+
+            setTimeout(() => {
+                if (startFadeTimeoutId) clearTimeout(startFadeTimeoutId);
+                if (soundFadeInterval) {
+                    clearInterval(soundFadeInterval);
+                    soundFadeInterval = null;
+                }
+                if (spinSound && !spinSound.paused) {
+                    spinSound.pause();
+                    spinSound.loop = false;
+                    spinSound.volume = 1;
+                }
+
+                prizeWonText.textContent = `Congratulations! You won ${currentWonPrizeName}!`;
+                
+                // Display the prize image
+                const imageSrc = getPrizeImageSrc(currentWonPrizeName);
+                if (imageSrc && prizeImageElement) {
+                    prizeImageElement.src = imageSrc;
+                    prizeImageElement.alt = currentWonPrizeName;
+                    prizeImageElement.style.display = 'block';
+                } else if (prizeImageElement) {
+                    prizeImageElement.style.display = 'none';
+                }
+                
+                wheelArea.classList.add('hidden'); 
+                spinButton.classList.add('hidden'); 
+
+                winningMessageSection.classList.remove('hidden');
+                updateShareProgress();
+                
+                triggerConfetti();
+            }, spinDurationSeconds * 1000 + 200);
+        });
+
+        whatsappShareButton.addEventListener('click', () => {
+            const userName = userNameInput.value.trim();
+            const userMobile = userMobileInput.value.trim();
+
+            if (userName === '') {
+                alert('Please enter your Name before sharing.');
+                userNameInput.focus();
+                return;
+            }
+            if (!/^\d{10}$/.test(userMobile)) {
+                 alert('Please enter a valid 10-digit Mobile Number before sharing.');
+                userMobileInput.focus();
+                return;
+            }
+
+            if (sharedCount < totalSharesNeeded) {
+                sharedCount++;
+                updateShareProgress();
+
+                const shareMessage = `I just won a FREE ${getPrizeCategory(currentWonPrizeName)} prize on this Spin & Win page! Try your luck too! ${window.location.href}`;
+                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+                
+                whatsappShareButton.disabled = true;
+                whatsappShareButton.textContent = "Opening WhatsApp...";
+
+                setTimeout(() => {
+                    window.open(whatsappUrl, '_blank');
+                    if (sharedCount < totalSharesNeeded) {
+                         whatsappShareButton.textContent = `Share on WhatsApp (${sharedCount}/${totalSharesNeeded})`;
+                         whatsappShareButton.disabled = false;
+                    }
+                }, 500);
+            }
+        });
+        
+        claimPrizeButton.addEventListener('click', () => {
+            const userName = userNameInput.value.trim();
+            const userMobile = userMobileInput.value.trim();
+             if (userName === '' || !/^\d{10}$/.test(userMobile)) {
+                alert('Please ensure your Name and a valid 10-digit Mobile Number are entered.');
+                return;
+            }
+            
+            claimPrizeButton.textContent = "Submitting...";
+            claimPrizeButton.disabled = true;
+
+            // REMOVED GOOGLE SHEET FETCH CALL
+            // const dataToSave = {
+            //     userName: userName,
+            //     userMobile: userMobile,
+            //     wonPrize: currentWonPrizeName
+            // };
+            // if (GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
+            //     fetch(GOOGLE_SCRIPT_URL, { ... }) ...
+            // }
+
+            setTimeout(() => {
+                winningMessageSection.classList.add('hidden'); 
+                successMessageSection.classList.remove('hidden');
+                triggerConfetti(0.6, { spread: 120, startVelocity: 25, decay: 0.9 });
+
+                const smsText = `Congratulations 🎉!! You have Won Free ${currentWonPrizeName}! Within 24 hours you will get a new message where you will be asked to fill in your address for delivery of your Won Prize.`;
+                simulatedSmsMessageElement.innerHTML = `An SMS confirmation has been (simulated) sent to: <strong>${userMobile}</strong><br><br><em>Message:</em> "${smsText}"`;
+                simulatedSmsMessageElement.classList.remove('hidden');
+
+            }, 500);
+        });
+
+
+        function getPrizeCategory(prizeName) {
+            if (prizeName.toLowerCase().includes("ticket")) return "IPL TICKET";
+            if (prizeName.toLowerCase().includes("jersey")) return "IPL JERSEY";
+            return "AWESOME";
+        }
+
+        function hideMessages() {
+            winningMessageSection.classList.add('hidden');
+            successMessageSection.classList.add('hidden');
+            simulatedSmsMessageElement.classList.add('hidden');
+            claimPrizeButton.classList.add('hidden');
+            claimPrizeButton.disabled = true; 
+
+            // Hide and reset prize image
+            if (prizeImageElement) {
+                prizeImageElement.style.display = 'none';
+                prizeImageElement.src = '';
+                prizeImageElement.alt = 'Prize Image';
+            }
+        }
+
+        function triggerConfetti(particleRatio = 1, opts = {}) {
+            const canvas = document.getElementById('confettiCanvas');
+            if (!canvas || typeof confetti !== 'function') {
+                console.error("Confetti library or canvas not found.");
+                return;
+            }
+
+            const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
+            const defaults = { origin: { y: 0.7 }, particleCount: Math.floor(200 * particleRatio), spread: 70 + (30 * particleRatio) };
+            myConfetti({ ...defaults, ...opts });
+
+            if (particleRatio === 1) { 
+                setTimeout(() => myConfetti({ ...defaults, origin: { x: 0.2, y: 0.6}, spread: 100, particleCount: Math.floor(100*particleRatio) }), 300);
+                setTimeout(() => myConfetti({ ...defaults, origin: { x: 0.8, y: 0.6}, spread: 100, particleCount: Math.floor(100*particleRatio) }), 600);
+            }
+        }
+
+        hideMessages();
+
+    </script>
+<script type="text/javascript">
+	atOptions = {
+		'key' : '8f08b2654b141d19486362ef7a7af8e7',
+		'format' : 'iframe',
+		'height' : 50,
+		'width' : 320,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/8f08b2654b141d19486362ef7a7af8e7/invoke.js"></script>
+<script type="text/javascript">
+	atOptions = {
+		'key' : '8f08b2654b141d19486362ef7a7af8e7',
+		'format' : 'iframe',
+		'height' : 50,
+		'width' : 320,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/8f08b2654b141d19486362ef7a7af8e7/invoke.js"></script>
+</body>
+</html>
